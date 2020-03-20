@@ -1,4 +1,4 @@
-package bytesconv //import github.com/tianhongw/misc-go/util/bytesconv
+package bytesconv
 
 import (
 	"reflect"

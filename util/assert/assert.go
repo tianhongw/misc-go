@@ -1,4 +1,4 @@
-package test //import github.com/tianhongw/misc-go/util/test
+package assert
 
 import (
 	"path/filepath"

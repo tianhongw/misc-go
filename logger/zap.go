@@ -1,4 +1,4 @@
-package logger //import github.com/tianhongw/misc-go/logger
+package logger
 
 import (
 	"errors"
