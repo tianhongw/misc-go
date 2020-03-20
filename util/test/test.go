@@ -1,4 +1,4 @@
-package test
+package test //import github.com/tianhongw/misc-go/util/test
 
 import (
 	"path/filepath"
