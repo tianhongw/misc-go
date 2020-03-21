@@ -11,10 +11,10 @@ import (
 
 // WorkerPool is pool of workers
 type WorkerPool struct {
-	wg       sync.WaitGroup
-	doneChan chan struct{}
-	workChan chan func()
-	once     sync.Once
+	wgWrapper *WaitGroupWrapper
+	doneChan  chan struct{}
+	workChan  chan func()
+	once      sync.Once
 }
 
 func newWorkerPool() *WorkerPool {
@@ -27,7 +27,7 @@ func newWorkerPool() *WorkerPool {
 func (wp *WorkerPool) Start() {
 	n := runtime.NumCPU()
 	for i := 0; i < n; i++ {
-		GoFunc(&wp.wg, func() {
+		wp.wgWrapper.Wrap(func() {
 			defer func() {
 				err := recover()
 				if err != nil {
@@ -50,7 +50,7 @@ func (wp *WorkerPool) Start() {
 func (wp *WorkerPool) Close() {
 	wp.once.Do(func() {
 		close(wp.doneChan)
-		wp.wg.Wait()
+		wp.wgWrapper.Wait()
 	})
 }
 
@@ -61,6 +61,12 @@ var (
 
 // Run a task
 func (wp *WorkerPool) Run(f func()) error {
+	select {
+	case <-wp.doneChan:
+		return ErrWorkerPoolClosed
+	default:
+	}
+
 	select {
 	case wp.workChan <- f:
 		return nil
