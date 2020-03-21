@@ -19,12 +19,12 @@ type WorkerPool struct {
 
 func NewWorkerPool() *WorkerPool {
 	wp := &WorkerPool{doneChan: make(chan struct{}), workChan: make(chan func())}
-	wp.Start()
+	wp.start()
 	return wp
 }
 
-// Start worker pool
-func (wp *WorkerPool) Start() {
+// start worker pool
+func (wp *WorkerPool) start() {
 	n := runtime.NumCPU()
 	for i := 0; i < n; i++ {
 		wp.wgWrapper.Wrap(func() {
