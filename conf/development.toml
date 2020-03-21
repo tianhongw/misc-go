@@ -1,0 +1,9 @@
+[common]
+# development, staging, production
+mode = "development"
+
+[log]
+level = "debug"
+format = "console"
+output = ["stdout"]
+err_output = ["stderr"]

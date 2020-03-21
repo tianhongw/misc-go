@@ -5,7 +5,7 @@ import (
 	"runtime"
 	"sync"
 
-	"github.com/tianhongw/misc-go/logger"
+	"github.com/tianhongw/misc-go/log"
 	"go.uber.org/zap"
 )
 
@@ -31,7 +31,7 @@ func (wp *WorkerPool) Start() {
 			defer func() {
 				err := recover()
 				if err != nil {
-					logger.Instance().Error("workerPool", zap.Any("err", err))
+					log.Instance().Error("workerPool", zap.Any("err", err))
 				}
 			}()
 			for {

@@ -1,20 +1,128 @@
-package logger
+package log
 
 import (
 	"errors"
+	"fmt"
 	"sort"
+	"sync"
 	"time"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
-var errEncodingNotSupported = errors.New("encoding not supported")
+var (
+	prodLogger *zap.Logger
+	devLogger  *zap.Logger
+)
+
+var (
+	prodMU sync.Mutex
+	devMU  sync.Mutex
+)
+
+var (
+	errEncodingNotSupported = errors.New("encoding not supported")
+)
+
+// EnvType for environment type
+type EnvType int
+
+const (
+	// Prod for production environment (default)
+	Prod EnvType = iota
+	// Dev for develop environment
+	Dev
+)
+
+// Env for chosen environment
+var Env EnvType
+
+// Instance for chosen logger
+func Instance() *zap.Logger {
+	switch Env {
+	case Prod:
+		return ProdInstance()
+	case Dev:
+		return DevInstance()
+	default:
+		panic(fmt.Sprintf("unknown EnvType:%v", Env))
+	}
+}
+
+// DevInstance returns the instance for develop environment
+func DevInstance() *zap.Logger {
+	if devLogger != nil {
+		return devLogger
+	}
+
+	devMU.Lock()
+	defer devMU.Unlock()
+	if devLogger != nil {
+		return devLogger
+	}
+
+	encoderConfig := zap.NewDevelopmentEncoderConfig()
+
+	zconf := zap.Config{
+		DisableCaller:     true,
+		DisableStacktrace: true,
+		Level:             zap.NewAtomicLevelAt(zapcore.DebugLevel),
+		Development:       true,
+		Encoding:          "json",
+		EncoderConfig:     encoderConfig,
+		OutputPaths:       []string{"stdout"},
+		ErrorOutputPaths:  []string{"stderr"},
+	}
+
+	var err error
+	devLogger, err = New(zconf)
+	if err != nil {
+		panic(fmt.Sprintf("DevInstance New:%v", err))
+	}
+
+	return devLogger
+}
+
+// ProdInstance returns the instance for production environment
+func ProdInstance() *zap.Logger {
+	if prodLogger != nil {
+		return prodLogger
+	}
+
+	prodMU.Lock()
+	defer prodMU.Unlock()
+	if prodLogger != nil {
+		return prodLogger
+	}
+
+	encoderConfig := zap.NewProductionEncoderConfig()
+	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+	encoderConfig.EncodeDuration = zapcore.StringDurationEncoder
+
+	zconf := zap.Config{
+		DisableCaller:     true,
+		DisableStacktrace: true,
+		Level:             zap.NewAtomicLevelAt(zapcore.InfoLevel),
+		Development:       false,
+		Encoding:          "json",
+		EncoderConfig:     encoderConfig,
+		OutputPaths:       []string{"stdout"},
+		ErrorOutputPaths:  []string{"stderr"},
+	}
+
+	var err error
+	prodLogger, err = New(zconf)
+	if err != nil {
+		panic(fmt.Sprintf("ProdInstance New:%v", err))
+	}
+
+	return prodLogger
+}
 
 // New is similar to Config.Build except that info and error logs are separated
 // only json/console encoder is supported (zap doesn't provide a way to refer to other encoders)
 func New(cfg zap.Config) (logger *zap.Logger, err error) {
-
 	sink, errSink, err := openSinks(cfg)
 	if err != nil {
 		return
