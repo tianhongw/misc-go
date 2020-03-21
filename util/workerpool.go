@@ -11,7 +11,7 @@ import (
 
 // WorkerPool is pool of workers
 type WorkerPool struct {
-	wgWrapper *WaitGroupWrapper
+	wgWrapper WaitGroupWrapper
 	doneChan  chan struct{}
 	workChan  chan func()
 	once      sync.Once
