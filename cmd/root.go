@@ -22,7 +22,7 @@ var (
 )
 
 var rootCmd = cobra.Command{
-	Use: "app name",
+	Use: "app",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		fmt.Printf("config file used: %s", cfgFile)
 	},
