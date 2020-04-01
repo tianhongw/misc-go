@@ -45,7 +45,7 @@ func doInit() {
 	if cfgFile == "" {
 		home, err := homedir.Dir()
 		if err != nil {
-			fmt.Errorf("failed to get home dir: %v", err)
+			fmt.Fprintf(os.Stderr, "failed to get home dir: %v", err)
 			os.Exit(1)
 		}
 		cfgFile = strings.Replace(defaultCfgFile, "$HOME", home, 1)
@@ -56,7 +56,7 @@ func doInit() {
 	}
 
 	if cfgFileUsed, err := conf.Init(cfgFile, cfgType); err != nil {
-		fmt.Errorf("failed to load config file: %v", err)
+		fmt.Fprintf(os.Stderr, "failed to load config file: %v", err)
 		os.Exit(1)
 	} else {
 		cfgFile = cfgFileUsed
@@ -65,14 +65,14 @@ func doInit() {
 
 func run() {
 	if err := conf.Opts.Validate(); err != nil {
-		fmt.Errorf("invalid config: %v", err)
+		fmt.Fprintf(os.Stderr, "invalid config: %v", err)
 		os.Exit(1)
 	}
 }
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Errorf("execute failed: %v", err)
+		fmt.Fprintf(os.Stderr, "execute failed: %v", err)
 		os.Exit(1)
 	}
 }
