@@ -9,6 +9,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/tianhongw/misc-go/conf"
+	"github.com/tianhongw/misc-go/db"
+	"github.com/tianhongw/misc-go/log"
 )
 
 const (
@@ -65,9 +67,21 @@ func doInit() {
 
 func run() {
 	if err := conf.Opts.Validate(); err != nil {
-		fmt.Fprintf(os.Stderr, "invalid config: %v", err)
+		fmt.Fprintf(os.Stderr, "load config failed: %v", err)
 		os.Exit(1)
 	}
+
+	if err := log.Init(conf.Opts); err != nil {
+		fmt.Fprintf(os.Stderr, "init log failed: %v", err)
+		os.Exit(1)
+	}
+	defer log.Flush()
+
+	if err := db.Init(conf.Opts); err != nil {
+		log.Errorf("init database failed: %v", err)
+		os.Exit(1)
+	}
+	defer db.Close()
 }
 
 func Execute() {

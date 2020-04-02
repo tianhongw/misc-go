@@ -7,3 +7,21 @@ level = "debug"
 format = "console"
 output = ["stdout"]
 err_output = ["stderr"]
+
+[database]
+dialect = "mysql"
+name = "db_name"
+username = "user"
+password = "password"
+# tcp, unix (defalut: tcp)
+network = "tcp"
+# ip:port when tcp, socket file path when unix
+address = "ip:port"
+charset = "utf8mb4"
+collation = "utf8mb4_general_ci"
+parseTime = true
+loc = "Local"
+tablePrefix = ""
+maxIdle = 30
+maxOpen = 30
+maxLifetime = "5m"

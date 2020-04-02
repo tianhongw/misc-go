@@ -5,6 +5,7 @@ go 1.14
 require (
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect
+	github.com/go-xorm/xorm v0.7.9
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.2.2 // indirect
@@ -23,4 +24,5 @@ require (
 	gopkg.in/ini.v1 v1.55.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 	gopkg.in/yaml.v2 v2.2.8 // indirect
+	xorm.io/core v0.7.2-0.20190928055935-90aeac8d08eb
 )

@@ -22,8 +22,9 @@ var (
 
 type (
 	Options struct {
-		Common *common `mapstructure:"common"`
-		Log    *log    `mapstructure:"log"`
+		Common   *common   `mapstructure:"common"`
+		Log      *log      `mapstructure:"log"`
+		Database *database `mapstructure:"database"`
 	}
 
 	common struct {
@@ -38,6 +39,23 @@ type (
 		MaxAge     int      `mapstructure:"max_age"`
 		MaxBackups int      `mapstructure:"max_backups"`
 		MaxSize    int      `mapstructure:"max_size"`
+	}
+
+	database struct {
+		Dialect     string `mapstructure:"dialect" validate:"required"`
+		Name        string `mapstructure:"name" validate:"required"`
+		Network     string `mapstructure:"network" validate:"required,oneof=tcp unix"`
+		Username    string `mapstructure:"username" validate:"required"`
+		Password    string `mapstructure:"password" validate:"required"`
+		Address     string `mapstructure:"address" validate:"required"`
+		Charset     string `mapstructure:"charset" validate:"required"`
+		Collation   string `mapstructure:"collation" validate:"required"`
+		Loc         string `mapstructure:"loc" validate:"required"`
+		ParseTime   bool   `mapstructure:"parseTime"`
+		TablePrefix string `mapstructure:"tablePrefix"`
+		MaxIdle     int    `mapstructure:"maxIdle"`
+		MaxOpen     int    `mapstructure:"maxOpen"`
+		MaxLifetime string `mapstructure:"maxLifetime"`
 	}
 )
 
@@ -58,6 +76,19 @@ func Init(filePath, fileType string) (string, error) {
 	v.SetDefault("log.max_age", 7)
 	v.SetDefault("log.max_backups", 3)
 	v.SetDefault("log.max_size", 500)
+
+	// database
+	v.SetDefault("database.dialect", "mysql")
+	v.SetDefault("database.network", "tcp")
+	v.SetDefault("database.address", "localhost:3306")
+	v.SetDefault("database.username", "root")
+	v.SetDefault("database.charset", "utf8mb64")
+	v.SetDefault("database.collation", "utf8mb4_general_ci")
+	v.SetDefault("database.loc", "UTC")
+	v.SetDefault("database.parseTime", true)
+	v.SetDefault("database.maxIdle", 5)
+	v.SetDefault("database.maxOpen", 10)
+	v.SetDefault("database.maxLifetime", "5m")
 
 	if err := v.ReadInConfig(); err != nil {
 		return "", fmt.Errorf("read confing failed, error: %v", err)
